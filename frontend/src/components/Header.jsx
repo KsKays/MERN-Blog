@@ -15,7 +15,7 @@ const Header = () => {
       <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
           <li>
-            <a>Create Post</a>
+            <a href="/create">Create Post</a>
           </li>
         </ul>
       </div>
