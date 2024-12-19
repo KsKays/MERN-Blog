@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const userRouter = require("./routers/user.router");
+const postRouter = require("./routers/post.router");
 
 const app = express();
 const BASE_URL = process.env.BASE_URL; //
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 
 //use Router
 app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/post", postRouter);
 
 app.listen(PORT, () => {
   console.log("Server Running on http://localhost:" + PORT); //เชื่อมกับ PORT
