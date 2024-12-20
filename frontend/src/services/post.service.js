@@ -10,8 +10,20 @@ const createPost = async (post) => {
   return response;
 };
 
+const getPosts = async () => {
+  const response = await api.get(API_URL); 
+  return response; 
+};
+
+const getPostsById = async (id) => {
+  const response = await api.get(`${API_URL}/${id}`);
+  return response;
+};
+
 const PostService = {
   createPost,
+  getPosts,
+  getPostsById
 };
 
 export default PostService;

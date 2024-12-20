@@ -20,7 +20,7 @@ const login = async (username, password) => {
     if (data.accessToken) {
       cookies.set("accessToken", data.accessToken, {
         path: "/",
-        expires: new Date(Date.now() + 86400), //expire date 24h
+        expires: new Date(Date.now() + 86400 * 1000), //expire date 24h
       });
       cookies.set("user", data);
     }

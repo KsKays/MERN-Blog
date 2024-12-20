@@ -7,4 +7,11 @@ const authJwt = require("../middlewares/authJwt.middleware");
 //http://localhost:5000/api/v1/post
 router.post("", authJwt.verifyToken, upload, postController.createPost);
 
+//http://localhost:5000/api/v1/post
+router.get("", postController.getPosts);
+
+
+//http://localhost:5000/api/v1/post
+router.get("/:id", postController.getPosts);
+
 module.exports = router;

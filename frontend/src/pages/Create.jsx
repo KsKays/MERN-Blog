@@ -1,18 +1,19 @@
-import { useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { useState, useRef } from "react";
 import PostService from "../services/post.service";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
+import Editor from "../components/Editor";
 
 const Create = () => {
   const [postDetail, setPostDetail] = useState({
     title: "",
     summary: "",
     content: "",
-    file: "",
+    file: null,
   });
 
+  const [content, setContent] = useState("");
+  const editorRef = useRef();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,6 +23,11 @@ const Create = () => {
     } else {
       setPostDetail({ ...postDetail, [name]: value });
     }
+  };
+
+  const handleContentChange = (value) => {
+    setContent(value);
+    setPostDetail({ ...postDetail, content: value });
   };
 
   const handleSubmit = async () => {
@@ -46,7 +52,7 @@ const Create = () => {
             title: "",
             summary: "",
             content: "",
-            file: "",
+            file: null,
           });
         });
 
@@ -70,7 +76,7 @@ const Create = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8 mb-8">
       <h1 className="text-3xl font-bold text-center mb-6">Create New Post</h1>
       <div className="space-y-6">
         <div>
@@ -111,32 +117,11 @@ const Create = () => {
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="content"
-            className="block text-lg font-semibold text-gray-700"
-          >
-            Content
-          </label>
-          <ReactQuill
-            value={postDetail.content}
-            onChange={(value) =>
-              setPostDetail({ ...postDetail, content: value })
-            }
-            placeholder="Write the content of your post"
-            className="mt-2 border border-gray-300 rounded-md"
-            theme="snow"
-            modules={{
-              toolbar: [
-                [{ header: "1" }, { header: "2" }, { font: [] }],
-                [{ list: "ordered" }, { list: "bullet" }],
-                ["bold", "italic", "underline"],
-                ["link"],
-                [{ align: [] }],
-                ["image"],
-                ["clean"],
-              ],
-            }}
+        <div className="h-64">
+          <Editor
+            value={content}
+            onChange={handleContentChange}
+            ref={editorRef}
           />
         </div>
 
