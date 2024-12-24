@@ -4,7 +4,7 @@ require("dotenv").config();
 const secret = process.env.SECRET;
 
 exports.createPost = async (req, res) => {
-  //File 
+  //File
   // //restruc จะไม่ได้รับ cover เข้ามาต้องจัดการก่อน >> middlewares
   const { path } = req.file;
   const author = req.userId;
@@ -24,12 +24,19 @@ exports.createPost = async (req, res) => {
   res.json(postDoc);
 };
 
-exports.getPosts = async (req,res)=>{
+//getPosts
+exports.getPosts = async (req, res) => {
   const posts = await PostModel.find()
-  .populate("author", ["username"])
-    .sort({createAt: -1})
+    .populate("author", ["username"])
+    .sort({ createAt: -1 })
     .limit(20);
-    //Select * FROM POST WHARE POST.author = USER._id
-    res.json(posts);
-  
-}
+  //Select * FROM POST WHARE POST.author = USER._id
+  res.json(posts);
+};
+
+//getPostsById
+exports.getById = async (req, res) => {
+  const { id } = req.params;
+  const postDoc = await PostModel.findById(id).populate("author", ["username"]);
+  res.json(postDoc);
+};

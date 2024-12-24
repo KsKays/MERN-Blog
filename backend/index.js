@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const userRouter = require("./routers/user.router");
 const postRouter = require("./routers/post.router");
 const { applyTimestamps } = require("./models/Post");
-
 const app = express();
 const BASE_URL = process.env.BASE_URL; //
 const PORT = process.env.PORT; //เชื่อมกับ PORT
@@ -25,7 +24,7 @@ app.get("/", (req, res) => {
   res.send("<h1>Welcome to SE NPRU Blog Resful API</h1>");
 });
 
-app.use("/uploads", express.static(__dirname + "/uploads"))
+app.use("/uploads", express.static(__dirname + "/uploads"));
 
 //use Router
 app.use("/api/v1/auth", userRouter);

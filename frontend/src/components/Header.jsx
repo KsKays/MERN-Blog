@@ -27,7 +27,7 @@ const Header = () => {
   };
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-slate-200 drop-shadow-lg">
       <div className="navbar-start">
         <div className="dropdown">
           <div
@@ -40,13 +40,13 @@ const Header = () => {
           DD NEWS
         </a>
       </div>
-      <div className="navbar-center hidden lg:flex">
+      {/* <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
             <a href="/create">Create Post</a>
           </li>
         </ul>
-      </div>
+      </div> */}
 
       <div className="navbar-end flex space-x-2">
         {user ? (
