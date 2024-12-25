@@ -13,4 +13,10 @@ router.get("", postController.getPosts);
 //http://localhost:5000/api/v1/post/id
 router.get("/:id", postController.getById);
 
+//http://localhost:5000/api/v1/post/id
+router.delete("/:id", authJwt.verifyToken, postController.deletePost);
+
+//http://localhost:5000/api/v1/post/id
+router.put("/:id", authJwt.verifyToken, upload, postController.updatePost);
+
 module.exports = router;

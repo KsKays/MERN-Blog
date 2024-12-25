@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import PostService from "../services/post.service";
 import Swal from "sweetalert2";
 import { useAuthContext } from "../context/AuthContext";
-
 const baseURL = import.meta.env.VITE_PIC_URL;
+
+import { format } from "date-fns";
+
+format(new Date(2014, 1, 11), "yyyy-MM-dd");
 
 const PostDetail = () => {
   const [postDetail, setPostDetail] = useState(null);
   const { id } = useParams();
   const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -20,64 +24,75 @@ const PostDetail = () => {
         }
       } catch (error) {
         Swal.fire({
-          title: "Error",
+          title: "Post Detail",
           text: error?.response?.data?.message || error.message,
           icon: "error",
         });
       }
     };
-
     fetchPost();
   }, [id]);
 
-  if (!postDetail) {
-    return null; // ถ้าไม่มีข้อมูลโพสต์ ให้คืนค่า null โดยไม่แสดงอะไร
-  }
+  const handleDelete = () => {
+    Swal.fire({
+      title: "Delete",
+      text: "Do you want to deltete this post?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PostService.deleteById(id); // เรียกใช้ฟังก์ชัน logout
+        Swal.fire({
+          title: "Delete Post",
+          text: "Delete successfully",
+          icon: "success",
+        }).then(() => {
+          navigate("/");
+        });
+      }
+    });
+  };
 
+  if (!postDetail) return <div>NOT FOUND</div>;
   return (
-    <div className="container mx-auto max-w-3xl mt-12 px-4 ">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden bg-blue-100">
-        <div className="relative">
-          <img
-            src={`${baseURL}/${postDetail.cover}`}
-            alt={postDetail.title}
-            className="w-full h-72 object-cover"
-          />
-          <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black opacity-70 w-full p-4">
-            <h1 className="text-4xl text-white font-bold">
-              {postDetail.title}
-            </h1>
+    <div className="post-page win-h-full min-w-full flex items-center p-4 pt-20 text-center">
+      <div className="bg-white p-8 rounded0-bg shadow-lg max-4xl w-full">
+        <h1 className="text-3xl font-bold mb-4 text-grey-800">
+          {postDetail.title}
+        </h1>
+
+        <div className="text-grey-600 mb-4 text-center">
+          <time className="block mb-2">
+            {format(postDetail.createdAt, "dd MMMM yyyy HH:mm")}
+          </time>
+          <div className="author mb-2">
+            <span className="text-blue-500">@{postDetail.author.username}</span>
           </div>
         </div>
-
-        <div className="p-6">
-          <p className="text-sm text-gray-400 mb-2">
-            {postDetail.author?.username || "Unknown Author"} -{" "}
-            {new Date(postDetail.createdAt).toLocaleDateString()}
-          </p>
-          <p className="text-xl font-semibold text-gray-800 mb-4">
-            {postDetail.summary}
-          </p>
-          <div
-            className="prose text-gray-700"
-            dangerouslySetInnerHTML={{ __html: postDetail.content }}
-          />
-
-          {postDetail.author?._id === user?.id && (
-            <p className="mt-6 text-green-600 font-semibold">
-              This post was created by you!
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-6 text-center">
-        <a
-          href="/"
-          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
-        >
-          Back
-        </a>
+        {user.id === postDetail.author._id && (
+          <div className="edit-row mb-4 text-center flex items-center justify-center gap-2">
+            <a href={`/edit/${postDetail._id}`} className="btn btn-warning">
+              Edit Post
+            </a>
+            <a
+              className="btn btn-error"
+              onClick={() => handleDelete(postDetail._id)}
+            >
+              Delete Post
+            </a>
+          </div>
+        )}
+        <img
+          src={`${baseURL}/${postDetail.cover}`}
+          alt={postDetail.title}
+          className="w-full h-64 object-cover mb-4"
+        />
+        <div
+          className="content text-grey-700"
+          dangerouslySetInnerHTML={{ __html: postDetail.content }}
+        ></div>
       </div>
     </div>
   );

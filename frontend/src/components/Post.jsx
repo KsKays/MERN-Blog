@@ -2,7 +2,7 @@ const baseURL = import.meta.env.VITE_PIC_URL;
 
 const Post = ({ _id, title, author, summary, cover, createdAt }) => {
   return (
-    <div className="card shadow-xl max-w-lg md:max-w-xl lg:max-w-2xl w-full mx-auto my-6 shadow-lg bg-blue-100">
+    <div className="card shadow-xl max-w-lg md:max-w-xl lg:max-w-2xl w-full mx-auto my-6 shadow-lg bg-slate-50">
       {" "}
       <figure className="md:1/2 flex items-center justify-center">
         <a href={"/post/" + _id} className="href">
