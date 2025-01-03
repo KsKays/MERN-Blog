@@ -6,6 +6,7 @@ import PostDetail from "../pages/PostDetail";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Layout from "../layouts/MainLayout";
+import PostByAuthor from "../pages/PostByAuthor"
 
 /**
  * Home
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "/Register",
         element: <Register />,
+      },
+       {
+        path: "/author/:id",
+        element: <PostByAuthor />,
       },
     ],
   },

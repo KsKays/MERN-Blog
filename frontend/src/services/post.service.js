@@ -1,4 +1,4 @@
-//import { post } from "../../../backend/routers/post.router";
+
 import api from "./api";
 const API_URL = import.meta.env.VITE_BASE_URL + "/post";
 
@@ -35,12 +35,19 @@ const deleteById = async (id) => {
   return response;
 };
 
+const getPostByAuthor = async (id) => {
+  const response = await api.get(`${API_URL}/author/${id}`);
+  return response;
+};
+
+
 const PostService = {
   createPost,
   getPosts,
   getPostsById,
   deleteById,
   updatePostById,
+  getPostByAuthor
 };
 
 export default PostService;

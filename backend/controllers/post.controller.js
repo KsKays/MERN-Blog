@@ -1,28 +1,45 @@
+const { ref } = require("firebase/storage");
 const PostModel = require("../models/Post");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.SECRET;
 
-//Create Post
+// Create Post controller
 exports.createPost = async (req, res) => {
-  //File
-  // //restruc จะไม่ได้รับ cover เข้ามาต้องจัดการก่อน >> middlewares
-  const { path } = req.file;
+  //File upload
+ if (!req.file) {
+    return res.status(400).json({ message: "Image is required" });
+  }
+  const { path } = req.file.firebaseUrl;
+  console.log(path);
+
   const author = req.userId;
   const { title, summary, content } = req.body;
-  if (!title || !summary || !content)
-    return res.status(400).json({
-      message: "All Fields is required",
-    });
+  if (!title || !summary || !content) {
+    return res.status(400).json({ message: "All Fields is requires" });
+  }
 
-  const postDoc = await PostModel.create({
-    title,
-    summary,
-    content,
-    cover: path,
-    author,
-  });
-  res.json(postDoc);
+  try {
+    const postDoc = await PostModel.create({
+      title,
+      summary,
+      content,
+      cover: req.file.firebaseUrl,
+      author,
+    });
+    if (!postDoc) {
+      res.status(400).send({
+        message: "Cannot create new post!",
+      });
+      return;
+    }
+    res.json(postDoc);
+  } catch (error) {
+    res.status(500).send({
+      message:
+        error.message || "Something error occurred while creating a new post.",
+    });
+  }
 };
 
 //getPosts
@@ -75,8 +92,8 @@ exports.updatePost = async (req, res) => {
     postDoc.summary = summary;
     postDoc.content = content;
     if (req.file) {
-      const { path } = req.file;
-      postDoc.cover = path;
+      
+      postDoc.cover = req.file.firebaseUrl;
     }
     await postDoc.save();
     res.json(postDoc);
@@ -87,6 +104,7 @@ exports.updatePost = async (req, res) => {
     });
   }
 };
+
 exports.deletePost = async (req, res) => {
   const { id } = req.params;
   const authorId = req.userId;
@@ -102,6 +120,27 @@ exports.deletePost = async (req, res) => {
   } catch (error) {
     res.status(500).send({
       message: error.message || "Something went wrong while delete the post!",
+    });
+  }
+};
+
+
+//getPostByAuthor
+exports.getPostByAuthor = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const postDoc = await PostModel.find({author: id}).populate("author", [
+      "username",
+    ]);
+    if (!postDoc) {
+      return res.status(404).send({
+        message: "Post Not Found!",
+      });
+    }
+    res.json(postDoc);
+  } catch (error) {
+    res.status(500).send({
+      message: "Something went wrong while getting post by author!",
     });
   }
 };

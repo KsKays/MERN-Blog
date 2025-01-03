@@ -1,4 +1,4 @@
-const baseURL = import.meta.env.VITE_PIC_URL;
+//const baseURL = import.meta.env.VITE_PIC_URL;
 
 const Post = ({ _id, title, author, summary, cover, createdAt }) => {
   return (
@@ -7,7 +7,7 @@ const Post = ({ _id, title, author, summary, cover, createdAt }) => {
       <figure className="md:1/2 flex items-center justify-center">
         <a href={"/post/" + _id} className="href">
           <img
-            src={`${baseURL}/${cover}`}
+            src={`${cover}`}
             alt={title}
             className="w-full h-80 object-cover"
           />

@@ -68,7 +68,7 @@ const PostDetail = () => {
             {format(postDetail.createdAt, "dd MMMM yyyy HH:mm")}
           </time>
           <div className="author mb-2">
-            <span className="text-blue-500">@{postDetail.author.username}</span>
+            <span className="text-blue-500">@<a href={`/author/${postDetail.author._id}`}>{postDetail.author.username}</a></span>
           </div>
         </div>
         {user?.id === postDetail.author._id && (
@@ -85,7 +85,7 @@ const PostDetail = () => {
           </div>
         )}
         <img
-          src={`${baseURL}/${postDetail.cover}`}
+          src={`${postDetail.cover}`}
           alt={postDetail.title}
           className="w-full h-64 object-cover mb-4"
         />
