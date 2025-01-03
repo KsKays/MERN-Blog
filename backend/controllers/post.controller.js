@@ -29,7 +29,7 @@ exports.createPost = async (req, res) => {
 exports.getPosts = async (req, res) => {
   const posts = await PostModel.find()
     .populate("author", ["username"])
-    .sort({ createAt: -1 })
+    .sort({ createdAt: -1 })
     .limit(20);
   //Select * FROM POST WHERE POST.author = USER._id
   res.json(posts);
@@ -67,7 +67,6 @@ exports.updatePost = async (req, res) => {
       });
       return;
     }
-
     const { title, summary, content } = req.body;
     if (!title || !summary || !content) {
       return res.status(400).json({ message: "All fields are required" });

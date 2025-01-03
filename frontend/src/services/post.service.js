@@ -1,4 +1,4 @@
-import { post } from "../../../backend/routers/post.router";
+//import { post } from "../../../backend/routers/post.router";
 import api from "./api";
 const API_URL = import.meta.env.VITE_BASE_URL + "/post";
 
@@ -16,8 +16,12 @@ const getPosts = async () => {
   return response;
 };
 
-const editPost = async (id) => {
-  const response = await api.put(`${API_URL}/${id}`);
+const updatePostById = async (id, post) => {
+  const response = await api.put(`${API_URL}/${id}`, post, {
+    headers: {
+      "Content-type": "multipart/form-data",
+    },
+  });
   return response;
 };
 
@@ -27,7 +31,7 @@ const getPostsById = async (id) => {
 };
 
 const deleteById = async (id) => {
-  const response = await api.delete(`${API_URL}/${id}`, post);
+  const response = await api.delete(`${API_URL}/${id}`);
   return response;
 };
 
@@ -36,7 +40,7 @@ const PostService = {
   getPosts,
   getPostsById,
   deleteById,
-  editPost,
+  updatePostById,
 };
 
 export default PostService;

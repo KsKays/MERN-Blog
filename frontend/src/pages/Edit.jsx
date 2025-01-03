@@ -1,39 +1,110 @@
-import { useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router";
+import swal from "sweetalert2";
+import PostService from "../services/post.service";
+import Editor from "../components/Editor";
+import { useAuthContext } from "../context/AuthContext";
 
 const Edit = () => {
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
+  const { id } = useParams();
+  const { user } = useAuthContext();
+  const [post, setPost] = useState({
+    title: "",
+    summary: "",
+    file: null,
+  });
   const [content, setContent] = useState("");
-  const [image, setImage] = useState(null);
+  const editorRef = useRef(null);
+  const navigate = useNavigate();
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await PostService.getPostsById(id);
+        if (response.status === 200) {
+          if (user.id !== response.data.author._id) {
+            navigate("/");
+          }
+          setPost(response.data);
+          setContent(response.data.content);
+        }
+      } catch (error) {
+        swal.fire({
+          title: "Error",
+          text: error?.response?.data?.message || error.message,
+          icon: "error",
+        });
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "file") {
+      setPost({ ...post, [name]: e.target.files[0] });
+    } else {
+      setPost({ ...post, [name]: value });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleContentChange = (value) => {
+    setContent(value);
+    setPost({ ...post, content: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Edit Post:", { title, summary, content, image });
+
+    try {
+      const data = new FormData();
+      data.append("title", post.title);
+      data.append("summary", post.summary);
+      data.append("content", post.content);
+      if (post.file) {
+        data.append("file", post.file);
+      }
+
+      const response = await PostService.updatePostById(id, data);
+
+      if (response.status === 200) {
+        swal
+          .fire({
+            title: "Update Post",
+            text: "Post updated successfully",
+            icon: "success",
+          })
+          .then(() => {
+            navigate(`/post/${id}`); // Redirect to the updated post
+          });
+      }
+    } catch (error) {
+      swal.fire({
+        title: "Update Post",
+        text: error?.response?.data?.message || error.message,
+        icon: "error",
+      });
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-3xl font-bold text-center mb-6">Edit Post</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="max-w-2xl mx-auto p-4 mt-8 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-semibold text-center mb-4">Edit Post</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label
             htmlFor="title"
-            className="block text-lg font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700"
           >
             Title
           </label>
           <input
             type="text"
-            id="title"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            name="title"
+            value={post.title}
+            onChange={handleChange}
+            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm"
             placeholder="Enter the post title"
             required
           />
@@ -42,15 +113,15 @@ const Edit = () => {
         <div>
           <label
             htmlFor="summary"
-            className="block text-lg font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700"
           >
             Summary
           </label>
           <textarea
-            id="summary"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md"
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
+            name="summary"
+            value={post.summary}
+            onChange={handleChange}
+            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm"
             placeholder="Write a short summary"
             rows="3"
             required
@@ -60,56 +131,40 @@ const Edit = () => {
         <div>
           <label
             htmlFor="content"
-            className="block text-lg font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700"
           >
             Content
           </label>
-          <ReactQuill
-            value={content}
-            onChange={setContent}
-            placeholder="Write the content of your post"
-            className="mt-2 border border-gray-300 rounded-md"
-            theme="snow"
-            modules={{
-              toolbar: [
-                [{ header: "1" }, { header: "2" }, { font: [] }],
-                [{ list: "ordered" }, { list: "bullet" }],
-                ["bold", "italic", "underline"],
-                ["link"],
-                [{ align: [] }],
-                ["image"],
-                ["clean"],
-              ],
-            }}
-          />
+          <div className="64">
+            <Editor
+              value={content}
+              onChange={handleContentChange}
+              ref={editorRef}
+            />
+          </div>
         </div>
 
         <div>
           <label
-            htmlFor="image"
-            className="block text-lg font-semibold text-gray-700"
+            htmlFor="file"
+            className="block text-sm font-semibold text-gray-700"
           >
             Upload Image
           </label>
           <input
             type="file"
-            id="image"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md"
-            onChange={handleImageChange}
+            name="file"
+            onChange={handleChange}
+            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm"
           />
-          {image && (
-            <p className="text-sm mt-2 text-gray-500">
-              File selected: {image.name}
-            </p>
-          )}
         </div>
 
         <div className="text-center">
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 text-sm"
           >
-            Confirm
+            Update Post
           </button>
         </div>
       </form>

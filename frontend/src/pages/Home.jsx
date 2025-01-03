@@ -29,7 +29,6 @@ const Home = () => {
         posts.map((post, index) => {
           return <Post key={index} {...post} />;
         })}{" "}
-      *
     </div>
   );
 };

@@ -71,7 +71,7 @@ const PostDetail = () => {
             <span className="text-blue-500">@{postDetail.author.username}</span>
           </div>
         </div>
-        {user.id === postDetail.author._id && (
+        {user?.id === postDetail.author._id && (
           <div className="edit-row mb-4 text-center flex items-center justify-center gap-2">
             <a href={`/edit/${postDetail._id}`} className="btn btn-warning">
               Edit Post
